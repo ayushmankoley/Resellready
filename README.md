@@ -34,14 +34,6 @@ Then open `http://localhost:3000`. Without `GOOGLE_API_KEY`, the UI uses its cle
 
 Google AI Studio is the default hosted inference adapter and the server calls it only from the backend. The model is configurable because an API key does not itself identify which Gemma model your project should use. Together AI remains available as an alternate provider by setting `MODEL_PROVIDER=together`.
 
-## Sponsor integrations
-
-- **Backboard:** the server has a memory adapter hook using `BACKBOARD_API_URL` and `BACKBOARD_API_KEY`. It retrieves seller preferences before generation.
-- **Tinker:** `TINKER_MODEL_ENDPOINT` is reserved for the fine-tuned model adapter. Add it after you have a trained endpoint and benchmark it against Together's baseline.
-- **Render:** `render.yaml` deploys the frontend and backend as one public service.
-
-The remaining sponsor work is intentionally gated on your real Backboard and Tinker API details. Do not invent API calls or put sponsor secrets in frontend JavaScript.
-
 ## Google AI Studio safety
 
 Do not paste the API key into chat, `script.js`, HTML, GitHub, or a committed `.env` file. Add it to Render's secret environment variables and use a local environment variable for local testing. Before deploying, confirm that `gemma-4-31b-it` is the exact model identifier exposed by your AI Studio account.
