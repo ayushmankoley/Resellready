@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: resellready
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MODEL_PROVIDER
+        value: google
+      - key: GOOGLE_API_KEY
+        sync: false
+      - key: GOOGLE_MODEL
+        value: gemma-4-31b-it
+      - key: TOGETHER_API_KEY
+        sync: false
+      - key: TOGETHER_MODEL
+        value: google/gemma-3n-E4B-it
+      - key: BACKBOARD_API_URL
+        sync: false
+      - key: BACKBOARD_API_KEY
+        sync: false
+      - key: TINKER_MODEL_ENDPOINT
+        sync: false

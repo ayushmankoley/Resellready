@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f4f0e7" />
+    <title>ReSellReady — listings that move</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="wordmark" href="./"><span class="wordmark-mark">↗</span> ReSellReady</a>
+      <nav aria-label="Primary navigation">
+        <a href="#how-it-works">How it works</a>
+        <a href="#privacy">Private by default</a>
+        <button class="button button-dark" id="new-listing" type="button">New listing <span aria-hidden="true">+</span></button>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">AI LISTING STUDIO / FOR THE SIDE HUSTLE</p>
+          <h1>Turn your<br /><em>stuff</em> into sales.</h1>
+          <p class="lede">Upload a few photos. ReSellReady adapts to vintage, handmade, food, print-on-demand, and more — then writes a listing that sounds like you.</p>
+          <div class="hero-actions">
+            <button class="button button-accent" id="start-listing" type="button">Create a listing <span aria-hidden="true">↗</span></button>
+            <span class="micro-note"><span class="pulse"></span> Hosted open-model inference</span>
+          </div>
+        </div>
+        <div class="hero-art" aria-label="Illustration of a ready-to-sell product">
+          <div class="sticker sticker-top">READY<br />TO SHIP</div>
+          <div class="product-card">
+            <div class="product-orb"></div>
+            <div class="product-copy">HANDMADE<br /><strong>+ HUMAN</strong></div>
+            <div class="product-scribble">good<br />things<br />sell</div>
+          </div>
+          <div class="sticker sticker-bottom">SELL<br />SMART</div>
+        </div>
+      </section>
+
+      <section class="stats-strip" id="how-it-works">
+        <div><strong>01</strong><span>Upload photos</span></div>
+        <div><strong>02</strong><span>Pick your product world</span></div>
+        <div><strong>03</strong><span>Publish with confidence</span></div>
+        <p>One workspace.<br /><b>Every kind of side hustle.</b></p>
+      </section>
+
+      <section class="workspace" id="studio" aria-labelledby="studio-title">
+        <div class="section-heading">
+          <p class="eyebrow">LISTING STUDIO</p>
+          <h2 id="studio-title">What are you selling?</h2>
+          <p>ReSellReady changes its questions, tone, and checks for the product in front of you.</p>
+        </div>
+        <div class="studio-grid">
+          <form class="setup-card" id="listing-form">
+            <div class="step-label"><span>01</span> PRODUCT TYPE</div>
+            <div class="type-grid" role="radiogroup" aria-label="Product type">
+              <label class="type-option selected"><input type="radio" name="productType" value="vintage" checked /><span class="type-symbol">◌</span><strong>Vintage</strong><small>thrift / pre-loved</small></label>
+              <label class="type-option"><input type="radio" name="productType" value="handmade" /><span class="type-symbol">✳</span><strong>Handmade</strong><small>craft / small batch</small></label>
+              <label class="type-option"><input type="radio" name="productType" value="food" /><span class="type-symbol">⌁</span><strong>Food</strong><small>bakes / pantry</small></label>
+              <label class="type-option"><input type="radio" name="productType" value="print-on-demand" /><span class="type-symbol">▧</span><strong>Print-on-demand</strong><small>shirts / art / merch</small></label>
+              <label class="type-option"><input type="radio" name="productType" value="other" /><span class="type-symbol">+</span><strong>Something else</strong><small>let the AI adapt</small></label>
+            </div>
+
+            <div class="step-label step-spaced"><span>02</span> PRODUCT DETAILS</div>
+            <label class="field-label" for="product-name">What is it called?</label>
+            <input class="text-input" id="product-name" name="productName" placeholder="e.g. 90s Levi's 501 jeans" autocomplete="off" required />
+            <div class="field-row">
+              <div><label class="field-label" for="platform">Where will you sell it?</label><select class="text-input" id="platform"><option>Etsy</option><option>eBay</option><option>Depop</option><option>Facebook Marketplace</option><option>Shopify</option></select></div>
+              <div><label class="field-label" for="tone">Listing voice</label><select class="text-input" id="tone"><option>Warm & clear</option><option>Playful</option><option>Minimal</option><option>Collector-grade</option></select></div>
+            </div>
+            <label class="field-label" for="details">Anything the buyer should know? <span>(optional)</span></label>
+            <textarea class="text-input details-input" id="details" placeholder="Condition, measurements, ingredients, materials, sizing..."></textarea>
+
+            <div class="step-label step-spaced"><span>03</span> PHOTOS</div>
+            <label class="drop-zone" for="photo-input" id="drop-zone">
+              <input id="photo-input" type="file" accept="image/*" multiple />
+              <span class="upload-icon">↑</span><strong>Drop product photos here</strong><small>or browse from your device · up to 6 images</small>
+            </label>
+            <div class="photo-previews" id="photo-previews"></div>
+            <button class="button button-accent full-button" type="submit">Generate my listing <span aria-hidden="true">↗</span></button>
+            <p class="privacy-note">The hosted API receives listing details only in this MVP. No account required.</p>
+          </form>
+
+          <section class="result-card" aria-live="polite">
+            <div class="result-top"><div><p class="eyebrow">YOUR LISTING</p><h3 id="result-title">Waiting for a product</h3></div><span class="mode-pill" id="mode-pill">DEMO MODE</span></div>
+            <div class="empty-result" id="empty-result"><div class="empty-mark">✦</div><strong>Your next sale starts here.</strong><p>Fill in the details on the left and we’ll build a marketplace-ready listing, adapted to your product type.</p></div>
+            <div class="generated-result hidden" id="generated-result">
+              <div class="quality-row"><span>LISTING HEALTH</span><strong><span id="quality-score">92</span>/100 <i>GOOD TO GO</i></strong></div>
+              <div class="output-block"><span class="output-label">TITLE</span><p id="output-title"></p></div>
+              <div class="output-block"><span class="output-label">DESCRIPTION</span><p id="output-description"></p></div>
+              <div class="output-columns"><div class="output-block"><span class="output-label">TAGS</span><p id="output-tags"></p></div><div class="output-block"><span class="output-label">BUYER CHECKLIST</span><p id="output-checklist"></p></div></div>
+              <div class="result-actions"><button class="button button-dark" id="copy-listing" type="button">Copy listing <span aria-hidden="true">↗</span></button><button class="button button-ghost" id="regenerate" type="button">Regenerate</button></div>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section class="privacy-section" id="privacy">
+        <div><p class="eyebrow">WHY OPEN AI?</p><h2>Your inventory is your business.</h2></div>
+        <div class="privacy-points"><p><b>01 / Private</b> Product photos and unreleased inventory can stay on your laptop with an open-weight model.</p><p><b>02 / Adaptable</b> Train the workflow for vintage clothing, handmade goods, food, or your own niche vocabulary.</p><p><b>03 / Affordable</b> No per-image API bill deciding whether your side hustle is worth running.</p></div>
+      </section>
+    </main>
+    <footer><span>ReSellReady / BUILD 01</span><span>Made for people who make the sale themselves.</span></footer>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="script.js"></script>
+  </body>
+</html>

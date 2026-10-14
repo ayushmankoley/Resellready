@@ -1,0 +1,13 @@
+{
+  "name": "resellready",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Hosted open-model listing studio for side-hustle sellers",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
