@@ -27,7 +27,7 @@ Then open `http://localhost:3000`. Without `GOOGLE_API_KEY`, the UI uses its cle
 
 1. Create a Google AI Studio API key with access to the Gemma model you plan to use.
 2. Copy `.env.example` to a private local `.env` only if testing locally. Never commit it.
-3. Set `MODEL_PROVIDER=google`, `GOOGLE_API_KEY`, and `GOOGLE_MODEL=gemma-4-31b-it` in Render's environment variables.
+3. Set `MODEL_PROVIDER=google`, `GOOGLE_API_KEY`, `GOOGLE_MODEL=gemma-4-31b-it`, and `GOOGLE_BACKUP_MODEL=gemma-4-26b-a4b-it` in Render's environment variables. If the primary model returns a temporary 429/5xx provider error, the server retries the request with the backup model.
 4. Deploy this folder as a Render Node web service. `render.yaml` contains the build, start, and health-check configuration.
 5. Confirm `https://YOUR-RENDER-URL/api/health` returns `{ "ok": true }`.
 6. Generate a listing from the public URL. The result badge should say `HOSTED ...`, not `DEMO MODE`.

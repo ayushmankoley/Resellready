@@ -3,6 +3,7 @@ const studio = document.querySelector("#studio");
 const resultTitle = document.querySelector("#result-title");
 const emptyResult = document.querySelector("#empty-result");
 const generatedResult = document.querySelector("#generated-result");
+const loadingResult = document.querySelector("#loading-result");
 const modePill = document.querySelector("#mode-pill");
 const toast = document.querySelector("#toast");
 const photoInput = document.querySelector("#photo-input");
@@ -42,9 +43,19 @@ function renderOutput(output, input, source = "DEMO MODE") {
   document.querySelector("#output-checklist").textContent = output.checklist;
   modePill.textContent = source;
   emptyResult.classList.add("hidden");
+  loadingResult.classList.add("hidden");
   generatedResult.classList.remove("hidden");
   lastOutput = `${output.title}\n\n${output.description}\n\nTags: ${output.tags}\n\nBuyer checklist:\n${output.checklist}`;
   studio.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+function setLoading(isLoading, input) {
+  loadingResult.classList.toggle("hidden", !isLoading);
+  emptyResult.classList.toggle("hidden", isLoading);
+  generatedResult.classList.add("hidden");
+  if (isLoading) {
+    resultTitle.textContent = input.name;
+    modePill.textContent = "GENERATING";
+  }
 }
 async function tryHostedModel(input) {
   const response = await fetch("/api/generate-listing", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(input) });
@@ -60,6 +71,7 @@ async function generateListing() {
   const button = form.querySelector('button[type="submit"]');
   button.disabled = true;
   button.textContent = "Writing your listing...";
+  setLoading(true, input);
   try {
     const output = await tryHostedModel(input);
     demoMode = false;
@@ -69,7 +81,7 @@ async function generateListing() {
     demoMode = true;
     renderOutput(fillTemplate(input), input);
     console.error("Hosted listing generation failed:", error);
-    showToast(`Demo listing ready: ${error.message || "hosted AI request failed"}.`);
+    showToast(`Demo listing ready: hosted models are busy. ${error.message || "Try again shortly."}`);
   } finally {
     button.disabled = false;
     button.innerHTML = "Generate my listing <span aria-hidden=\"true\">↗</span>";

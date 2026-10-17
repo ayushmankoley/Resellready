@@ -7,6 +7,7 @@ const root = fileURLToPath(new URL(".", import.meta.url));
 const port = Number(process.env.PORT || 3000);
 const maxBodyBytes = 64 * 1024;
 const googleModel = process.env.GOOGLE_MODEL || "gemma-4-31b-it";
+const googleBackupModel = process.env.GOOGLE_BACKUP_MODEL || "gemma-4-26b-a4b-it";
 const togetherModel = process.env.TOGETHER_MODEL || "google/gemma-3n-E4B-it";
 const providerTimeoutMs = 45_000;
 
@@ -61,7 +62,10 @@ async function readProviderResponse(response) {
 function providerError(provider, response, body) {
   const providerMessage = body.data?.error?.message || body.data?.message;
   const detail = providerMessage || body.text.trim().slice(0, 500) || "empty response body";
-  return new Error(`${provider} returned HTTP ${response.status}: ${detail}`);
+  const error = new Error(`${provider} returned HTTP ${response.status}: ${detail}`);
+  error.status = response.status;
+  error.retryable = [429, 500, 502, 503, 504].includes(response.status);
+  return error;
 }
 
 function promptFor(input, memory = []) {
@@ -142,9 +146,9 @@ async function generateWithTogether(prompt) {
   return normalizeOutput(data.choices?.[0]?.message?.content);
 }
 
-async function generateWithGoogle(prompt) {
+async function generateWithGoogle(prompt, model = googleModel) {
   if (!process.env.GOOGLE_API_KEY) throw new Error("Google AI Studio is not configured yet. Add GOOGLE_API_KEY in Render.");
-  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(googleModel)}:generateContent?key=${encodeURIComponent(process.env.GOOGLE_API_KEY)}`, {
+  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(process.env.GOOGLE_API_KEY)}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -162,8 +166,16 @@ async function generateWithGoogle(prompt) {
 
 async function generateWithConfiguredProvider(prompt) {
   const provider = process.env.MODEL_PROVIDER || "google";
-  if (provider === "google") return generateWithGoogle(prompt);
-  if (provider === "together") return generateWithTogether(prompt);
+  if (provider === "google") {
+    try {
+      return { output: await generateWithGoogle(prompt), model: googleModel };
+    } catch (error) {
+      if ((!error.retryable && error.name !== "TimeoutError") || googleBackupModel === googleModel) throw error;
+      console.warn(`Primary Google model ${googleModel} failed; retrying with backup ${googleBackupModel}.`);
+      return { output: await generateWithGoogle(prompt, googleBackupModel), model: googleBackupModel };
+    }
+  }
+  if (provider === "together") return { output: await generateWithTogether(prompt), model: togetherModel.split("/").pop() };
   throw new Error(`Unsupported MODEL_PROVIDER: ${provider}. Use google or together.`);
 }
 
@@ -173,11 +185,11 @@ async function generateListing(request, response) {
     const input = await readJson(request);
     console.info(`[${requestId}] listing request provider=${process.env.MODEL_PROVIDER || "google"} model=${googleModel}`);
     const memory = await getBackboardMemory(input);
-    const output = await generateWithConfiguredProvider(promptFor(input, memory));
+    const result = await generateWithConfiguredProvider(promptFor(input, memory));
     const provider = process.env.MODEL_PROVIDER || "google";
-    const model = provider === "google" ? googleModel : togetherModel.split("/").pop();
+    const model = provider === "google" ? result.model : togetherModel.split("/").pop();
     console.info(`[${requestId}] listing request succeeded`);
-    json(response, 200, { ...output, modelLabel: `HOSTED ${model}`, requestId });
+    json(response, 200, { ...result.output, modelLabel: `HOSTED ${model}`, requestId });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Listing generation failed.";
     console.error(`[${requestId}] listing request failed: ${message}`, error);
@@ -206,6 +218,7 @@ createServer((request, response) => {
     ok: true,
     provider: process.env.MODEL_PROVIDER || "google",
     model: (process.env.MODEL_PROVIDER || "google") === "google" ? googleModel : togetherModel,
+    backupModel: (process.env.MODEL_PROVIDER || "google") === "google" ? googleBackupModel : null,
     memory: Boolean(process.env.BACKBOARD_API_URL && process.env.BACKBOARD_API_KEY),
     fineTunedModel: Boolean(process.env.TINKER_MODEL_ENDPOINT)
   });

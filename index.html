@@ -9,6 +9,40 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="style.css" />
+    <style>
+      .workspace .section-heading { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(220px, 270px); align-items: end; }
+      .workspace .section-heading .eyebrow { position: absolute; top: -25px; left: 0; margin: 0; }
+      .result-top h3 { overflow-wrap: anywhere; }
+      .result-card .button-ghost { color: var(--paper); border-color: #5b5850; }
+      .loading-result { display: grid; place-items: center; align-content: center; min-height: 470px; text-align: center; }
+      .loading-result.hidden { display: none; }
+      .loading-result strong { margin-top: 22px; color: var(--paper); font-size: 20px; letter-spacing: -.04em; }
+      .loading-result p { max-width: 285px; margin: 10px 0 0; color: #99958c; font: 10px/1.6 var(--mono); }
+      .loading-orbit { position: relative; width: 82px; height: 82px; border: 1px solid #45433e; border-radius: 50%; animation: spin 8s linear infinite; }
+      .loading-orbit:before, .loading-orbit:after, .loading-orbit span { content: ""; position: absolute; display: block; width: 14px; height: 14px; border-radius: 50%; background: var(--accent); }
+      .loading-orbit:before { top: -7px; left: 34px; }
+      .loading-orbit:after { top: 34px; right: -7px; background: var(--orange); }
+      .loading-orbit span:first-child { bottom: -7px; left: 34px; background: var(--blue); }
+      .loading-orbit span:nth-child(2) { inset: 16px; border: 1px solid #6b685f; background: transparent; }
+      .loading-orbit span:nth-child(3) { display: none; }
+      .loading-dots { display: inline-block; width: 18px; overflow: hidden; vertical-align: bottom; animation: dots 1.2s steps(4, end) infinite; }
+      .loading-lines { display: grid; gap: 7px; width: min(260px, 80%); margin-top: 30px; }
+      .loading-lines i { display: block; height: 5px; background: #34332f; border-radius: 9px; animation: loading-pulse 1.4s ease-in-out infinite; }
+      .loading-lines i:nth-child(2) { width: 78%; animation-delay: .15s; }
+      .loading-lines i:nth-child(3) { width: 55%; animation-delay: .3s; }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      @keyframes dots { 0% { width: 0; } 100% { width: 18px; } }
+      @keyframes loading-pulse { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
+      @media (max-width: 800px) {
+        .workspace .section-heading { display: block; }
+        .workspace .section-heading h2 { margin-top: 35px; }
+        .workspace .section-heading > p:last-child { margin-top: 18px; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .loading-orbit, .loading-dots, .loading-lines i { animation: none; }
+        .loading-dots { width: auto; }
+      }
+    </style>
   </head>
   <body>
     <header class="topbar">
@@ -88,6 +122,12 @@
 
           <section class="result-card" aria-live="polite">
             <div class="result-top"><div><p class="eyebrow">YOUR LISTING</p><h3 id="result-title">Waiting for a product</h3></div><span class="mode-pill" id="mode-pill">DEMO MODE</span></div>
+            <div class="loading-result hidden" id="loading-result" aria-live="polite">
+              <div class="loading-orbit" aria-hidden="true"><span></span><span></span><span></span></div>
+              <strong>Writing your listing<span class="loading-dots" aria-hidden="true">...</span></strong>
+              <p>ReSellReady is shaping the details for your product world.</p>
+              <div class="loading-lines" aria-hidden="true"><i></i><i></i><i></i></div>
+            </div>
             <div class="empty-result" id="empty-result"><div class="empty-mark">✦</div><strong>Your next sale starts here.</strong><p>Fill in the details on the left and we’ll build a marketplace-ready listing, adapted to your product type.</p></div>
             <div class="generated-result hidden" id="generated-result">
               <div class="quality-row"><span>LISTING HEALTH</span><strong><span id="quality-score">92</span>/100 <i>GOOD TO GO</i></strong></div>
