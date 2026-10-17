@@ -8,6 +8,7 @@ const port = Number(process.env.PORT || 3000);
 const maxBodyBytes = 64 * 1024;
 const googleModel = process.env.GOOGLE_MODEL || "gemma-4-31b-it";
 const togetherModel = process.env.TOGETHER_MODEL || "google/gemma-3n-E4B-it";
+const providerTimeoutMs = 45_000;
 
 const productProfiles = {
   vintage: {
@@ -40,6 +41,27 @@ const productProfiles = {
 function json(response, status, payload) {
   response.writeHead(status, { "Content-Type": "application/json", "Cache-Control": "no-store" });
   response.end(JSON.stringify(payload));
+}
+
+function createRequestId() {
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+async function readProviderResponse(response) {
+  const text = await response.text();
+  let data = null;
+  try {
+    data = text ? JSON.parse(text) : null;
+  } catch {
+    // Preserve the raw response below when the provider does not return JSON.
+  }
+  return { text, data };
+}
+
+function providerError(provider, response, body) {
+  const providerMessage = body.data?.error?.message || body.data?.message;
+  const detail = providerMessage || body.text.trim().slice(0, 500) || "empty response body";
+  return new Error(`${provider} returned HTTP ${response.status}: ${detail}`);
 }
 
 function promptFor(input, memory = []) {
@@ -92,10 +114,12 @@ async function getBackboardMemory(input) {
   const response = await fetch(`${process.env.BACKBOARD_API_URL}/memory/search`, {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${process.env.BACKBOARD_API_KEY}` },
-    body: JSON.stringify({ userId: input.sellerId || "demo-seller", query: `${input.type} listing preferences` })
+    body: JSON.stringify({ userId: input.sellerId || "demo-seller", query: `${input.type} listing preferences` }),
+    signal: AbortSignal.timeout(providerTimeoutMs)
   });
-  if (!response.ok) throw new Error("Backboard memory lookup failed.");
-  const data = await response.json();
+  const body = await readProviderResponse(response);
+  if (!response.ok) throw providerError("Backboard", response, body);
+  const data = body.data;
   return Array.isArray(data.memories) ? data.memories.map((memory) => memory.text || memory.content).filter(Boolean).slice(0, 8) : [];
 }
 
@@ -109,10 +133,12 @@ async function generateWithTogether(prompt) {
       temperature: 0.35,
       response_format: { type: "json_object" },
       messages: [{ role: "user", content: prompt }]
-    })
+    }),
+    signal: AbortSignal.timeout(providerTimeoutMs)
   });
-  if (!response.ok) throw new Error(`Together AI returned ${response.status}.`);
-  const data = await response.json();
+  const body = await readProviderResponse(response);
+  if (!response.ok) throw providerError("Together AI", response, body);
+  const data = body.data;
   return normalizeOutput(data.choices?.[0]?.message?.content);
 }
 
@@ -124,10 +150,12 @@ async function generateWithGoogle(prompt) {
     body: JSON.stringify({
       generationConfig: { temperature: 0.35, responseMimeType: "application/json" },
       contents: [{ role: "user", parts: [{ text: prompt }] }]
-    })
+    }),
+    signal: AbortSignal.timeout(providerTimeoutMs)
   });
-  if (!response.ok) throw new Error(`Google AI Studio returned ${response.status}. Check GOOGLE_MODEL and API access.`);
-  const data = await response.json();
+  const body = await readProviderResponse(response);
+  if (!response.ok) throw providerError("Google AI Studio", response, body);
+  const data = body.data;
   const content = data.candidates?.[0]?.content?.parts?.map((part) => part.text || "").join("");
   return normalizeOutput(content);
 }
@@ -140,15 +168,20 @@ async function generateWithConfiguredProvider(prompt) {
 }
 
 async function generateListing(request, response) {
+  const requestId = createRequestId();
   try {
     const input = await readJson(request);
+    console.info(`[${requestId}] listing request provider=${process.env.MODEL_PROVIDER || "google"} model=${googleModel}`);
     const memory = await getBackboardMemory(input);
     const output = await generateWithConfiguredProvider(promptFor(input, memory));
     const provider = process.env.MODEL_PROVIDER || "google";
     const model = provider === "google" ? googleModel : togetherModel.split("/").pop();
-    json(response, 200, { ...output, modelLabel: `HOSTED ${model}` });
+    console.info(`[${requestId}] listing request succeeded`);
+    json(response, 200, { ...output, modelLabel: `HOSTED ${model}`, requestId });
   } catch (error) {
-    json(response, 503, { error: error instanceof Error ? error.message : "Listing generation failed." });
+    const message = error instanceof Error ? error.message : "Listing generation failed.";
+    console.error(`[${requestId}] listing request failed: ${message}`, error);
+    json(response, 503, { error: message, requestId });
   }
 }
 

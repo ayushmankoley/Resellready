@@ -68,7 +68,8 @@ async function generateListing() {
   } catch (error) {
     demoMode = true;
     renderOutput(fillTemplate(input), input);
-    showToast(`Demo listing ready: hosted AI is not configured yet.`);
+    console.error("Hosted listing generation failed:", error);
+    showToast(`Demo listing ready: ${error.message || "hosted AI request failed"}.`);
   } finally {
     button.disabled = false;
     button.innerHTML = "Generate my listing <span aria-hidden=\"true\">↗</span>";
