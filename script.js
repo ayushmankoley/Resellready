@@ -59,11 +59,25 @@ function setLoading(isLoading, input) {
 }
 async function tryHostedModel(input) {
   const response = await fetch("/api/generate-listing", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(input) });
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ error: "Hosted model request failed" }));
-    throw new Error(error.error || "Hosted model request failed");
+  const raw = await response.text();
+  let payload = null;
+  try {
+    payload = raw ? JSON.parse(raw) : null;
+  } catch {
+    const preview = raw.replace(/\s+/g, " ").slice(0, 180);
+    throw new Error(`Hosted API returned non-JSON${preview ? `: ${preview}` : " with an empty response"}`);
   }
-  return response.json();
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+    throw new Error("Hosted API returned an invalid response shape.");
+  }
+  if (!response.ok) {
+    throw new Error(payload.error || `Hosted model request failed (HTTP ${response.status})`);
+  }
+  if (typeof payload.title !== "string" || typeof payload.description !== "string" ||
+      !Array.isArray(payload.tags) || !Array.isArray(payload.checklist)) {
+    throw new Error("Hosted API returned an incomplete listing.");
+  }
+  return payload;
 }
 async function generateListing() {
   const input = collectInput();

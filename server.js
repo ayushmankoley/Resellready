@@ -85,11 +85,41 @@ title (string), description (string), tags (array of strings), checklist (array 
 Never invent brand, material, condition, ingredients, authenticity, measurements, pricing, or delivery claims. Make suggestions editable.`;
 }
 
+function parseModelJson(raw) {
+  if (raw && typeof raw === "object") return raw;
+  if (typeof raw !== "string" || !raw.trim()) {
+    const error = new Error("The model returned an empty response.");
+    error.code = "MODEL_OUTPUT";
+    throw error;
+  }
+
+  const text = raw.trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
+  const candidates = [text];
+  const firstBrace = text.indexOf("{");
+  const lastBrace = text.lastIndexOf("}");
+  if (firstBrace >= 0 && lastBrace > firstBrace) candidates.push(text.slice(firstBrace, lastBrace + 1));
+
+  for (const candidate of candidates) {
+    try {
+      return JSON.parse(candidate);
+    } catch {
+      // Try the next bounded JSON candidate before reporting the model error.
+    }
+  }
+
+  const preview = text.replace(/\s+/g, " ").slice(0, 180);
+  const error = new Error(`The model returned non-JSON output${preview ? `: ${preview}` : "."}`);
+  error.code = "MODEL_OUTPUT";
+  throw error;
+}
+
 function normalizeOutput(raw) {
-  const output = typeof raw === "string" ? JSON.parse(raw) : raw;
+  const output = parseModelJson(raw);
   if (!output || typeof output.title !== "string" || typeof output.description !== "string" ||
       !Array.isArray(output.tags) || !Array.isArray(output.checklist)) {
-    throw new Error("The model returned an invalid listing shape.");
+    const error = new Error("The model returned JSON, but not the required listing fields.");
+    error.code = "MODEL_OUTPUT";
+    throw error;
   }
   const qualityScore = Number(output.qualityScore ?? output.score);
   return {
@@ -170,7 +200,7 @@ async function generateWithConfiguredProvider(prompt) {
     try {
       return { output: await generateWithGoogle(prompt), model: googleModel };
     } catch (error) {
-      if ((!error.retryable && error.name !== "TimeoutError") || googleBackupModel === googleModel) throw error;
+      if ((!error.retryable && error.name !== "TimeoutError" && error.code !== "MODEL_OUTPUT") || googleBackupModel === googleModel) throw error;
       console.warn(`Primary Google model ${googleModel} failed; retrying with backup ${googleBackupModel}.`);
       return { output: await generateWithGoogle(prompt, googleBackupModel), model: googleBackupModel };
     }
