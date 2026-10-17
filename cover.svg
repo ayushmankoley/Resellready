@@ -1,7 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="840" viewBox="0 0 1600 840" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="4096" height="4096" viewBox="0 0 1600 1600" role="img" aria-labelledby="title desc">
   <title id="title">ReSellReady — an open Gemma AI agent for side-hustle sellers</title>
   <desc id="desc">A warm editorial cover with a black listing panel, neon yellow accents, and marketplace listing language.</desc>
-  <rect width="1600" height="840" fill="#f4f0e7"/>
+  <rect width="1600" height="1600" fill="#f4f0e7"/>
+  <g transform="translate(0 380)">
   <circle cx="1410" cy="112" r="76" fill="#e7ff57"/>
   <text x="1410" y="102" text-anchor="middle" fill="#1a1917" font-family="Arial, sans-serif" font-size="18" font-weight="700">YOUR</text>
   <text x="1410" y="126" text-anchor="middle" fill="#1a1917" font-family="Arial, sans-serif" font-size="18" font-weight="700">NEXT SALE</text>
@@ -29,5 +30,6 @@
     <rect x="34" y="360" width="225" height="8" fill="#3a3935"/>
     <text x="34" y="425" fill="#99958c" font-family="monospace" font-size="14" letter-spacing="2">TITLE · DESCRIPTION · TAGS</text>
     <text x="34" y="450" fill="#e7ff57" font-family="monospace" font-size="14" letter-spacing="2">BUYER CHECKLIST ↗</text>
+  </g>
   </g>
 </svg>
