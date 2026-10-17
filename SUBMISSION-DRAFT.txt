@@ -45,7 +45,9 @@ Best Use of Gemma.
 
 Best Use of Render — Render hosts the public ReSellReady frontend and backend as a single Node.js web service, with a public live demo and `/api/health` deployment check.
 
-I am not claiming partner categories whose technology is not implemented in this version. Render is used for application hosting, while Gemma is used for the AI runtime through Google AI Studio.
+Best Use of GitHub Copilot — GitHub Copilot was used throughout the build to develop, debug, refine, and ship the ReSellReady agent.
+
+Render is used for application hosting, while Gemma is used for the AI runtime through Google AI Studio.
 
 <!-- Team Submissions: Please pick one member to publish the submission and credit teammates by listing their DEV usernames directly in the body of the post. -->
 
