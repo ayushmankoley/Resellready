@@ -70,7 +70,7 @@ function providerError(provider, response, body) {
 
 function promptFor(input, memory = []) {
   const profile = productProfiles[input.type] || productProfiles.other;
-  return `You are ReSellReady, a careful marketplace listing assistant for side-hustle sellers.
+  return `You are ReSellReady, a focused marketplace listing agent for side-hustle sellers.
 Your task is to turn the seller's factual notes into a polished, editable marketplace listing.
 
 INPUT

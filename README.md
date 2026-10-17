@@ -1,15 +1,19 @@
 # ReSellReady
 
-ReSellReady is a product-adaptive listing studio for side-hustle sellers. It changes its copy, questions, quality checklist, and suggested tags based on whether the seller is listing vintage goods, handmade products, food, print-on-demand products, or something else.
+ReSellReady is a focused AI listing agent for side-hustle sellers. Give it a product name, marketplace, voice, and seller notes, and it adapts its workflow to vintage goods, handmade products, food, print-on-demand products, or another product world. It returns an editable title, description, tags, buyer checklist, and listing-health score.
+
+It is intentionally a narrow agent rather than a general chatbot: it selects category-aware instructions, applies safety constraints, asks for missing facts through its checklist, and produces a structured marketplace listing.
 
 ## What is built
 
-- Responsive seller-facing UI
+- Responsive seller-facing AI agent UI
 - Product-type adaptation
 - Photo previews that stay in the browser
 - Marketplace and tone controls
 - Demo-mode listing generation with no account or API key (for UI development only)
-- Hosted Together AI + Gemma adapter
+- Hosted Google AI Studio Gemma inference
+- Primary/backup Gemma model failover for temporary provider errors
+- Structured JSON validation and recovery for imperfect model output
 - Copy-to-clipboard and regenerate actions
 - Explicit privacy and model-safety copy
 
@@ -32,7 +36,13 @@ Then open `http://localhost:3000`. Without `GOOGLE_API_KEY`, the UI uses its cle
 5. Confirm `https://YOUR-RENDER-URL/api/health` returns `{ "ok": true }`.
 6. Generate a listing from the public URL. The result badge should say `HOSTED ...`, not `DEMO MODE`.
 
-Google AI Studio is the default hosted inference adapter and the server calls it only from the backend. The model is configurable because an API key does not itself identify which Gemma model your project should use. Together AI remains available as an alternate provider by setting `MODEL_PROVIDER=together`.
+Google AI Studio is the default hosted inference adapter and the server calls it only from the backend. Gemma is the agent's open-weight reasoning and generation layer; the application prompt supplies category routing, safety constraints, examples, and the structured output contract. The model is configurable because an API key does not itself identify which Gemma model your project should use. Together AI remains available as an alternate provider by setting `MODEL_PROVIDER=together`.
+
+## Live demo
+
+- App: https://resellready.onrender.com
+- Health check: https://resellready.onrender.com/api/health
+- Source: https://github.com/ayushmankoley/Resellready
 
 ## Google AI Studio safety
 

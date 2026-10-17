@@ -1,0 +1,50 @@
+This is a submission for the [Hacktoberfest Open-Source AI Challenge Week 2: Side Hustle](https://dev.to/challenges/hacktoberfest-week2-2026-10-12)
+
+## What I Built
+
+ReSellReady is a focused AI listing agent for side-hustle sellers. A seller enters a product name, marketplace, writing voice, and the facts they know. ReSellReady adapts its instructions to the product category, then generates an editable marketplace title, description, tags, buyer checklist, and listing-health score.
+
+It supports vintage, handmade, food, print-on-demand, and other independent-seller products. A freelancer, Etsy seller, vintage reseller, home baker, or independent maker could pay for it to turn rough product notes into a stronger listing without hiring a copywriter for every item.
+
+The agent is deliberately narrow: it routes category-specific questions, follows safety constraints, avoids inventing product facts, identifies missing information in the checklist, and returns a structured listing rather than pretending to be a general chatbot.
+
+## Demo
+
+Live demo: https://resellready.onrender.com
+
+Health check: https://resellready.onrender.com/api/health
+
+## Code
+
+Repository: https://github.com/ayushmankoley/Resellready
+
+## How I Built It
+
+ReSellReady uses Google's open-weight Gemma models through Google AI Studio:
+
+- Primary model: `gemma-4-31b-it`
+- Backup model: `gemma-4-26b-a4b-it`
+
+The browser UI sends listing details to a small Node.js backend. The backend builds a category-aware agent prompt containing the seller's facts, marketplace, tone, safety rules, output contract, and an example. It calls Gemma server-side, validates the returned JSON, recovers JSON wrapped in code fences or explanatory text, and retries with the backup model for temporary provider failures or malformed model output.
+
+The frontend includes product adaptation, photo previews, a loading state, hosted-model labeling, error fallback, and copy-to-clipboard actions. Render hosts the public Node.js service, while the Google API key remains a server-side environment secret.
+
+## Why Does Open Innovation Matter?
+
+Open innovation makes this product easier to adapt to the real vocabulary of small sellers. A vintage reseller, home baker, or handmade maker has different facts and safety concerns; the prompt and model can be tuned around those workflows instead of forcing every seller into a generic copywriting experience.
+
+Using an open-weight Gemma model also reduces dependence on a closed model vendor's product decisions and makes the agent's behavior inspectable and changeable. The model can be swapped, backed up, evaluated, or eventually fine-tuned for a niche category. Hosted inference keeps the demo accessible while the application still keeps the provider key out of the browser.
+
+## My Agent Session
+
+Optional: add the saved DevRelay session link here before publishing.
+
+## Prize Categories
+
+Best Use of Gemma.
+
+I am not claiming partner categories whose technology is not implemented in this version. Render is used for application hosting, not as an AI model runtime.
+
+<!-- Team Submissions: Please pick one member to publish the submission and credit teammates by listing their DEV usernames directly in the body of the post. -->
+
+<!-- Thanks for participating! -->
