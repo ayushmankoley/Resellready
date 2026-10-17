@@ -35,17 +35,19 @@ function fillTemplate(input) {
   return { title, description, tags: profile.tags, checklist: profile.checklist, score: profile.score };
 }
 function renderOutput(output, input, source = "DEMO MODE") {
+  const tags = Array.isArray(output.tags) ? output.tags : String(output.tags || "").split(",").map((tag) => tag.trim()).filter(Boolean);
+  const checklist = Array.isArray(output.checklist) ? output.checklist : String(output.checklist || "").split(/\r?\n/).map((item) => item.trim()).filter(Boolean);
   resultTitle.textContent = output.title;
   document.querySelector("#quality-score").textContent = output.qualityScore ?? output.score;
   document.querySelector("#output-title").textContent = output.title;
   document.querySelector("#output-description").textContent = output.description;
-  document.querySelector("#output-tags").textContent = output.tags;
-  document.querySelector("#output-checklist").textContent = output.checklist;
+  document.querySelector("#output-tags").textContent = tags.join(", ");
+  document.querySelector("#output-checklist").textContent = checklist.join("\n");
   modePill.textContent = source;
   emptyResult.classList.add("hidden");
   loadingResult.classList.add("hidden");
   generatedResult.classList.remove("hidden");
-  lastOutput = `${output.title}\n\n${output.description}\n\nTags: ${output.tags}\n\nBuyer checklist:\n${output.checklist}`;
+  lastOutput = `${output.title}\n\n${output.description}\n\nTags: ${tags.join(", ")}\n\nBuyer checklist:\n${checklist.join("\n")}`;
   studio.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 function setLoading(isLoading, input) {
