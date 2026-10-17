@@ -59,7 +59,7 @@ function setLoading(isLoading, input) {
   if (isLoading) {
     resultTitle.textContent = input.name;
     modePill.textContent = "GENERATING";
-    modelNote.textContent = "OPEN MODEL · GEMMA · PRIMARY + BACKUP";
+    modelNote.textContent = "OPEN MODEL · GEMMA";
   }
 }
 async function tryHostedModel(input) {
