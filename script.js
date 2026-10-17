@@ -5,6 +5,7 @@ const emptyResult = document.querySelector("#empty-result");
 const generatedResult = document.querySelector("#generated-result");
 const loadingResult = document.querySelector("#loading-result");
 const modePill = document.querySelector("#mode-pill");
+const modelNote = document.querySelector("#model-note");
 const toast = document.querySelector("#toast");
 const photoInput = document.querySelector("#photo-input");
 const photoPreviews = document.querySelector("#photo-previews");
@@ -44,6 +45,7 @@ function renderOutput(output, input, source = "DEMO MODE") {
   document.querySelector("#output-tags").textContent = tags.join(", ");
   document.querySelector("#output-checklist").textContent = checklist.join("\n");
   modePill.textContent = source;
+  modelNote.textContent = output.modelLabel ? `OPEN MODEL · ${output.modelLabel.replace(/^HOSTED\s+/i, "")}` : "OPEN MODEL · GEMMA · DEMO PREVIEW";
   emptyResult.classList.add("hidden");
   loadingResult.classList.add("hidden");
   generatedResult.classList.remove("hidden");
@@ -57,6 +59,7 @@ function setLoading(isLoading, input) {
   if (isLoading) {
     resultTitle.textContent = input.name;
     modePill.textContent = "GENERATING";
+    modelNote.textContent = "OPEN MODEL · GEMMA · PRIMARY + BACKUP";
   }
 }
 async function tryHostedModel(input) {

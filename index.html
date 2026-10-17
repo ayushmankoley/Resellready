@@ -13,6 +13,7 @@
       .workspace .section-heading { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(220px, 270px); align-items: end; }
       .workspace .section-heading .eyebrow { position: absolute; top: -25px; left: 0; margin: 0; }
       .result-top h3 { overflow-wrap: anywhere; }
+      .model-note { margin: 8px 0 0; color: #84b982; font: 8px var(--mono); letter-spacing: .1em; }
       .result-card .button-ghost { color: var(--paper); border-color: #5b5850; }
       .loading-result { display: grid; place-items: center; align-content: center; min-height: 470px; text-align: center; }
       .loading-result.hidden { display: none; }
@@ -62,7 +63,7 @@
           <p class="lede">Upload a few photos. ReSellReady adapts to vintage, handmade, food, print-on-demand, and more — then writes a listing that sounds like you.</p>
           <div class="hero-actions">
             <button class="button button-accent" id="start-listing" type="button">Create a listing <span aria-hidden="true">↗</span></button>
-            <span class="micro-note"><span class="pulse"></span> Hosted open-model inference</span>
+            <span class="micro-note"><span class="pulse"></span> Open model / Gemma inference</span>
           </div>
         </div>
         <div class="hero-art" aria-label="Illustration of a ready-to-sell product">
@@ -121,7 +122,7 @@
           </form>
 
           <section class="result-card" aria-live="polite">
-            <div class="result-top"><div><p class="eyebrow">YOUR LISTING</p><h3 id="result-title">Waiting for a product</h3></div><span class="mode-pill" id="mode-pill">DEMO MODE</span></div>
+            <div class="result-top"><div><p class="eyebrow">YOUR LISTING</p><h3 id="result-title">Waiting for a product</h3><p class="model-note" id="model-note">OPEN MODEL · GEMMA</p></div><span class="mode-pill" id="mode-pill">DEMO MODE</span></div>
             <div class="loading-result hidden" id="loading-result" aria-live="polite">
               <div class="loading-orbit" aria-hidden="true"><span></span><span></span><span></span></div>
               <strong>Writing your listing<span class="loading-dots" aria-hidden="true">...</span></strong>
